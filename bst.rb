@@ -16,7 +16,7 @@ def Tree
     def build_tree(arr)
         arr.uniq.sort
         root, tmp_root = nil
-        cond = false
+        cond = true
         arr.each do |val|
             if root.nil?
                 root = Node.new(val)
@@ -37,7 +37,7 @@ def Tree
                                 else
                                     tmp_root.left = Node.new(val)
                                 end
-                                cond = true
+                                cond = false
                            end
                         end
                     else
@@ -59,6 +59,7 @@ def Tree
                                 else
                                     tmp_root = Node.new(val)
                                 end
+                                cond = false
                             end
                         end
                     else
@@ -66,9 +67,69 @@ def Tree
                     end
                 end
             end 
-            cond = false
+            cond = true
         end
         return root
     end
-    
+    def insert(val)
+        cond = true
+        tmp = @root
+        while cond
+            if @root.nil?
+                build_tree(val)
+            elsif tmp.left.present? && tmp.right.present?
+                if val >= tmp.data
+                    tmp = tmp.right
+                else
+                    tmp = tmp.left
+                end
+            else
+                cond = false
+            end
+        end
+        if val >= tmp.data
+            tmp.right = Node.new(val)
+        else
+            tmp.left = Node.new(val)
+    end
+    def delete(val)
+        cond = true
+        tmp = @root
+       while cond
+            if @root.data == val && @root.left.nil? && @root.right.nil?
+                return nil
+            elsif @root.data == val && @root.left.present? && @oot.right.present?
+                @root = build_tree(deconstruct(@root,val))
+            elsif tmp.left.data == val
+                tmp = build_tree(deconstruct(tmp,val))
+                cond = false
+            elsif tmp.right.data == val
+            tmp = build_tree(deconstruct(tmp,val))
+            cond = false
+        else
+            if val > tmp.data
+                tmp = tmp.right
+            elsif val < tmp.data
+                tmp = tmp.left
+            end
+       end
+    end
+    #helper method for delete(val)
+    def deconstruct(node,except = nil)
+        arr = [node]
+        cond = true
+        while cond
+            next if node.data == except
+            if node.left.present? && node.right.present?
+                arr.push(deconstruct(node.left,except))
+                arr.push(deconstruct(node.right,except))
+            else
+                cond = false
+            end
+        end
+        arr.flatten
+        return arr
+    end
+    def find(val)
+    end
 end
