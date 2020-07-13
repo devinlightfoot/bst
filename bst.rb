@@ -97,6 +97,9 @@ def Tree
         tmp = @root
        while cond
             if @root.data == val && @root.left.nil? && @root.right.nil?
+                cond = false
+                return nil
+            elsif tmp.data != val && tmp.left.nil? && tmp.right.nil?
                 return nil
             elsif @root.data == val && @root.left.present? && @oot.right.present?
                 @root = build_tree(deconstruct(@root,val))
@@ -131,5 +134,26 @@ def Tree
         return arr
     end
     def find(val)
+        cond = true
+        tmp = @root
+        while cond
+            return nil if @root.nil?
+            if tmp.data = val
+                cond = true
+                return tmp
+            elsif tmp.left.data = val
+                return tmp.elft
+            elsif tmp.right.data = val
+                return tmp.right
+            elsif tmp.left.nil? && tmp.right.nil? && tmp.data != val
+                return nil
+            else
+                if val > tmp.data
+                    tmp = tmp.right
+                else
+                    tmp = tmp.left
+                end
+            end
+        end
     end
 end
