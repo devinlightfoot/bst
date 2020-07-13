@@ -18,61 +18,31 @@ class Tree
   # broken
   def build_tree(arr)
     arr.uniq.sort
-    root, tmp_root = nil
+    tmp = @root
     cond = true
     arr.each do |val|
-      if root.nil?
-        root = Node.new(val)
-      else
-        if val >= root.data
-          if !root.right.nil?
-            tmp_root = root.right
-            while cond
-              if !tmp_root.left.nil? && !tmp_root.right.nil?
-                tmp_root = if val >= tmp_root.data
-                             tmp_root.right
-                           else
-                             tmp_root.left
-                             end
-              else
-                if val >= tmp_root.data
-                  tmp_root.right = Node.new(val)
-                else
-                  tmp_root.left = Node.new(val)
-                  end
-                cond = false
-              end
+        if @root.nil?
+            @root = Node.new(val)
+        end
+        while cond
+            if tmp.left.nil? && tmp.right.nil?
+                if val >= tmp.data
+                    tmp.right = Node.new(val)
+                elsif val < tmp.data
+                    tmp.left = Node.new(val)
+                end
+            else
+                if val >= tmp.data
+                    tmp.right = tmp
+                    cond = false
+                elsif val < tmp.data
+                    tmp = tmp.left
+                    cond = false
+                end
             end
-          else
-            root.right = Node.new(val)
-          end
-        elsif val < root.data
-          if !root.left.nil?
-            tmp_root = root.left
-            while cond
-              if !tmp_root.left.nil? && !tmp_root.right.nil?
-                tmp_root = if val >= tmp_root.data
-                             tmp_root.right
-                           else
-                             tmp_root.left
-                             end
-              else
-                if val >= tmp_root.data
-                  tmp_root.right = Node.new(val)
-                else
-                  tmp_root = Node.new(val)
-                  end
-                cond = false
-              end
-            end
-          else
-            root.left = Node.new(val)
-          end
-          end
-      end
-      cond = true
+        end
+        cond = true
     end
-    root
   end
 
   # works?
@@ -134,12 +104,12 @@ class Tree
     while cond
       return nil if @root.nil?
 
-      if tmp.data = val
+      if tmp.data == val
         cond = true
         return tmp.data
-      elsif tmp.left.data = val
+      elsif tmp.left.data == val
         return tmp.left.data
-      elsif tmp.right.data = val
+      elsif tmp.right.data == val
         return tmp.right.data
       elsif tmp.left.nil? && tmp.right.nil? && tmp.data != val
         return nil
