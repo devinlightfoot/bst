@@ -21,7 +21,6 @@ class Tree
   def initialize(arr)
     @root = build_tree(arr)
   end
-#broken
   def build_tree(arr)
     arr.uniq.sort
     tmp = @root
@@ -30,8 +29,6 @@ class Tree
     end
     return @root
   end
-
-  # works?
   def insert( data )
     if @root.nil?
       @root = Node.new( data )
@@ -40,7 +37,7 @@ class Tree
     end
   end
 
-  # works?
+  # needs work
   def delete(val)
     cond = true
     tmp = @root
@@ -67,30 +64,14 @@ class Tree
       end
     end
   end
-
-  # works?
-  def find(val)
-    cond = true
-    tmp = @root
-    while cond
-      return nil if @root.nil?
-
-      if tmp.data == val
-        cond = true
-        return tmp.data
-      elsif tmp.left.data == val
-        return tmp.left.data
-      elsif tmp.right.data == val
-        return tmp.right.data
-      elsif tmp.left.nil? && tmp.right.nil? && tmp.data != val
-        return nil
-      else
-        tmp = if val > tmp.data
-                tmp.right
-              else
-                tmp.left
-              end
-      end
+  def search( key, node=@root )
+    return nil if node.nil?
+    if key < node.key
+      search( key, node.left )
+    elsif key > node.key
+      search( key, node.right )
+    else
+      return node
     end
   end
 
@@ -139,30 +120,37 @@ class Tree
     yield node
   end
 
-  def height(node)
+  def depth(node)
     return 0 if node.nil?
 
-    leftHeight = check_height(node.left)
-    return -1 if leftHeight == -1
+    leftdepth = depth(node.left)
+    return -1 if leftdepth == -1
 
-    rightHeight = check_height(node.right)
-    return -1 if rightHeight == -1
+    rightdepth = depth(node.right)
+    return -1 if rightdepth == -1
 
-    diff = leftHeight - rightHeight
+    diff = leftdepth - rightdepth
     if diff.abs > 1
       -1
     else
-      [leftHeight, rightHeight].max + 1
+      [leftdepth, rightdepth].max + 1
     end
   end
 
   def balanced?(node = @root)
-    height(node) != -1
+    depth(node) == -1 ? false : true
+  end
+  def rebalance()
+    if !self.balanced?
+      puts"Unbalanced tree"
+
+    end
   end
 end
 class Driver
   def initialize()
     tree = Tree.new(Array.new(15) { rand(1..100) })
+    puts tree.balanced?
     puts 'pre_order'
     tree.pre_order do |node|
       puts node.data
