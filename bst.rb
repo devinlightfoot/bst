@@ -5,8 +5,15 @@ class Node
   attr_accessor :data, :left, :right
   def initialize(data = nil)
     @data = data
-    @left = left
-    @right = right
+    @left = nil
+    @right = nil
+  end
+  def insert( data )
+    if data <= @data
+      @left.nil? ? @left = Node.new( data ) : @left.insert( data )
+    elsif data > @data
+      @right.nil? ? @right = Node.new( data ) : @right.insert( data )
+    end
   end
 end
 class Tree
@@ -14,58 +21,22 @@ class Tree
   def initialize(arr)
     @root = build_tree(arr)
   end
-
-  # broken
+#broken
   def build_tree(arr)
     arr.uniq.sort
     tmp = @root
-    cond = true
     arr.each do |val|
-        if @root.nil?
-            @root = Node.new(val)
-        end
-        while cond
-            if tmp.left.nil? && tmp.right.nil?
-                if val >= tmp.data
-                    tmp.right = Node.new(val)
-                elsif val < tmp.data
-                    tmp.left = Node.new(val)
-                end
-            else
-                if val >= tmp.data
-                    tmp.right = tmp
-                    cond = false
-                elsif val < tmp.data
-                    tmp = tmp.left
-                    cond = false
-                end
-            end
-        end
-        cond = true
+      self.insert(val)
     end
+    return @root
   end
 
   # works?
-  def insert(val)
-    cond = true
-    tmp = @root
-    while cond
-      if @root.nil?
-        build_tree(val)
-      elsif !tmp.left.nil? && !tmp.right.nil?
-        tmp = if val >= tmp.data
-                tmp.right
-              else
-                tmp.left
-                end
-      else
-        cond = false
-      end
-    end
-    if val >= tmp.data
-      tmp.right = Node.new(val)
+  def insert( data )
+    if @root.nil?
+      @root = Node.new( data )
     else
-      tmp.left = Node.new(val)
+      @root.insert( data )
     end
   end
 
@@ -185,22 +156,28 @@ class Tree
     end
   end
 
-  def is_balanced?(node = @root)
-    check_height(node) != -1
+  def balanced?(node = @root)
+    height(node) != -1
   end
 end
-tree = Tree.new(Array.new(15) { rand(1..100) })
-puts 'pre_order'
-tree.pre_order do |node|
-  puts node.data
-end
+class Driver
+  def initialize()
+    tree = Tree.new(Array.new(15) { rand(1..100) })
+    puts 'pre_order'
+    tree.pre_order do |node|
+      puts node.data
+    end
 
-puts 'in_order'
-tree.in_order do |node|
-  puts node.data
-end
+    puts 'in_order'
+    tree.in_order do |node|
+     puts node.data
+    end
 
-puts 'post_order'
-tree.post_order do |node|
-  puts node.data
+    puts 'post_order'
+    tree.post_order do |node|
+      puts node.data
+    end
+  end
 end
+driver = Driver.new
+
