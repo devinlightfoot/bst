@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 class Node
   include Comparable
   attr_accessor :data, :left, :right
@@ -9,9 +8,9 @@ class Node
     @right = nil
   end
   def insert( data )
-    if data <= @data
+    if data < @data
       @left.nil? ? @left = Node.new( data ) : @left.insert( data )
-    elsif data > @data
+    elsif data >= @data
       @right.nil? ? @right = Node.new( data ) : @right.insert( data )
     end
   end
@@ -22,7 +21,7 @@ class Tree
     @root = build_tree(arr)
   end
   def build_tree(arr)
-    arr.uniq.sort
+    arr.uniq!.sort!
     tmp = @root
     arr.each do |val|
       self.insert(val)
@@ -64,36 +63,27 @@ class Tree
       end
     end
   end
-  def search( key, node=@root )
+  def search( val, node=@root )
     return nil if node.nil?
-    if key < node.key
-      search( key, node.left )
-    elsif key > node.key
-      search( key, node.right )
+    if val < node.data
+      search(val, node.left )
+    elsif val > node.data
+      search(val, node.right )
     else
       return node
     end
   end
-
-  # broken
-  def level_order
-    arr = []
+  def level_order(node = @root)
     q = []
-    q.push(@root)
-    cond = true
-    while cond
-      break if q.empty?
-
-      tmp = q[0]
-      arr.push(tmp.data)
-      if !tmp.left.nil?
-        q.push(tmp.left)
-      elsif !tmp.right.nil?
-        q.push(tmp.right)
-      end
-      q.pop
+    ret = []
+    q.push(node)
+    while(!q.empty?)
+      tmp = q.shift
+      if(tmp.left) then q.push(tmp.left) end
+      if(tmp.right) then q.push(tmp.right) end
+      ret.push(tmp.data)
     end
-    arr
+    return ret
   end
 
   def pre_order(node = @root, &block)
@@ -140,17 +130,22 @@ class Tree
   def balanced?(node = @root)
     depth(node) == -1 ? false : true
   end
+  #needs work
   def rebalance()
-    if !self.balanced?
-      puts"Unbalanced tree"
-
+    while !self.balanced?
+      arr = self.level_order
+      binding.pry
+      @root = self.build_tree(arr)
     end
   end
 end
 class Driver
   def initialize()
     tree = Tree.new(Array.new(15) { rand(1..100) })
-    puts tree.balanced?
+    puts "Balanced?: #{tree.balanced?}"
+    tree.rebalance
+    puts "level_order"
+    puts tree.level_order
     puts 'pre_order'
     tree.pre_order do |node|
       puts node.data
