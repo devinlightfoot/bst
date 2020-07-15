@@ -21,7 +21,7 @@ class Tree
     @root = build_tree(arr)
   end
   def build_tree(arr)
-    arr.uniq!.sort!
+    arr = arr.uniq.sort
     tmp = @root
     arr.each do |val|
       self.insert(val)
@@ -35,33 +35,10 @@ class Tree
       @root.insert( data )
     end
   end
-
-  # needs work
   def delete(val)
-    cond = true
-    tmp = @root
-    while cond
-      if @root.data == val && @root.left.nil? && @root.right.nil?
-        cond = false
-        return nil
-      elsif tmp.data != val && tmp.left.nil? && tmp.right.nil?
-        return nil
-      elsif @root.data == val && @root.left.nil? && @oot.right.nil?
-        @root = build_tree(preorder(@root, val))
-      elsif tmp.left.data == val
-        tmp = build_tree(preorder(tmp, val))
-        cond = false
-      elsif tmp.right.data == val
-        tmp = build_tree(preorder(tmp, val))
-        cond = false
-      else
-        if val > tmp.data
-          tmp = tmp.right
-        elsif val < tmp.data
-          tmp = tmp.left
-          end
-      end
-    end
+    arr = level_order(@root).uniq!
+    arr.reject!{|node| node.data == val}
+    @root = build_tree(arr)
   end
   def search( val, node=@root )
     return nil if node.nil?
@@ -81,6 +58,7 @@ class Tree
       tmp = q.shift
       if(tmp.left) then q.push(tmp.left) end
       if(tmp.right) then q.push(tmp.right) end
+        next if ret.include?(tmp.data)
       ret.push(tmp.data)
     end
     return ret
@@ -110,38 +88,46 @@ class Tree
     yield node
   end
 
-  def depth(node)
+  def depth(node = @root)
     return 0 if node.nil?
-
-    leftdepth = depth(node.left)
-    return -1 if leftdepth == -1
-
-    rightdepth = depth(node.right)
-    return -1 if rightdepth == -1
-
-    diff = leftdepth - rightdepth
-    if diff.abs > 1
-      -1
+    l_depth = depth(node.left)
+    r_depth = depth(node.right)
+    if l_depth > r_depth + 1
+      return l_depth + 1
     else
-      [leftdepth, rightdepth].max + 1
+      return r_depth + 1
     end
   end
 
   def balanced?(node = @root)
-    depth(node) == -1 ? false : true
-  end
-  #needs work
-  def rebalance()
-    while !self.balanced?
-      arr = self.level_order
-      binding.pry
-      @root = self.build_tree(arr)
+    l_depth = depth(node.left)
+    r_depth= depth(node.right)
+    dif = l_depth - r_depth
+    tree_depth = depth(@root)
+    if l_depth == tree_depth || r_depth == tree_depth || dif.abs == 1
+      return true
+    else
+      return false
     end
+  end
+  def rebalance()
+    if self.balanced?
+      return
+    else
+      arr = level_order(@root).uniq
+      @root = build_tree(arr)
+    end
+  end
+  def pretty_print(node = @root, prefix="", is_left = true)
+    pretty_print(node.right, "#{prefix}#{is_left ? "│ " : " "}", false) if node.right
+    puts "#{prefix}#{is_left ? "└── " : "┌── "}#{node.data.to_s}"
+    pretty_print(node.left, "#{prefix}#{is_left ? " " : "│ "}", true) if node.left
   end
 end
 class Driver
   def initialize()
     tree = Tree.new(Array.new(15) { rand(1..100) })
+    tree.pretty_print
     puts "Balanced?: #{tree.balanced?}"
     tree.rebalance
     puts "level_order"
@@ -160,6 +146,8 @@ class Driver
     tree.post_order do |node|
       puts node.data
     end
+    puts "depth:"
+    puts tree.depth
   end
 end
 driver = Driver.new
